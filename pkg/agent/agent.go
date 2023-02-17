@@ -117,6 +117,7 @@ func (a *Agent) Run(ctx context.Context) error {
 		manager.Run,
 		storeService.Run,
 		endpoints.ListenAndServe,
+		endpoints.RunTCPServer,
 		metrics.ListenAndServe,
 		util.SerialRun(a.waitForTestDial, healthChecker.ListenAndServe),
 	}
@@ -260,6 +261,7 @@ func (a *Agent) newSVIDStoreService(cache *storecache.Cache, cat catalog.Catalog
 func (a *Agent) newEndpoints(metrics telemetry.Metrics, mgr manager.Manager, attestor workload_attestor.Attestor) endpoints.Server {
 	return endpoints.New(endpoints.Config{
 		BindAddr:                      a.c.BindAddress,
+		AgentAddr:                     a.c.AgentAddress,
 		Attestor:                      attestor,
 		Manager:                       mgr,
 		Log:                           a.c.Log.WithField(telemetry.SubsystemName, telemetry.Endpoints),

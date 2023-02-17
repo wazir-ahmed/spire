@@ -21,6 +21,8 @@ import (
 type Config struct {
 	BindAddr net.Addr
 
+	AgentAddr *net.TCPAddr
+
 	Attestor attestor.Attestor
 
 	Manager manager.Manager

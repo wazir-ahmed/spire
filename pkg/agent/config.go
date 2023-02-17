@@ -18,6 +18,8 @@ type Config struct {
 	// Address to bind the workload api to
 	BindAddress net.Addr
 
+	AgentAddress *net.TCPAddr
+
 	// Directory to store runtime data
 	DataDir string
 

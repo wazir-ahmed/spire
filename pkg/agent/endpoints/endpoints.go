@@ -26,6 +26,7 @@ type Server interface {
 
 type Endpoints struct {
 	addr              net.Addr
+	TCPAddr           *net.TCPAddr
 	log               logrus.FieldLogger
 	metrics           telemetry.Metrics
 	workloadAPIServer workload_pb.SpiffeWorkloadAPIServer
@@ -98,6 +99,7 @@ func New(c Config) *Endpoints {
 
 	return &Endpoints{
 		addr:              c.BindAddr,
+		TCPAddr:           c.AgentAddr,
 		log:               c.Log,
 		metrics:           c.Metrics,
 		workloadAPIServer: workloadAPIServer,
@@ -140,8 +142,9 @@ func (e *Endpoints) ListenAndServe(ctx context.Context) error {
 	}).Info("Starting Workload and SDS APIs")
 	e.triggerListeningHook()
 	errChan := make(chan error)
-	go func() { errChan <- server.Serve(l) }()
-
+	go func() {
+		errChan <- server.Serve(l)
+	}()
 	select {
 	case err = <-errChan:
 	case <-ctx.Done():
@@ -158,5 +161,51 @@ func (e *Endpoints) ListenAndServe(ctx context.Context) error {
 func (e *Endpoints) triggerListeningHook() {
 	if e.hooks.listening != nil {
 		e.hooks.listening <- struct{}{}
+	}
+}
+
+func (e *Endpoints) createTCPServer(ctx context.Context) *grpc.Server {
+
+	unaryInterceptor, streamInterceptor := middleware.Interceptors(
+		Middleware(e.log, e.metrics),
+	)
+	return grpc.NewServer(
+		grpc.UnaryInterceptor(unaryInterceptor),
+		grpc.StreamInterceptor(streamInterceptor),
+	)
+}
+
+// runTCPServer will start the server and block until it exits or we are dying.
+func (e *Endpoints) RunTCPServer(ctx context.Context, server *grpc.Server) error {
+	tcpServer := e.createTCPServer(ctx)
+	grpc_health_v1.RegisterHealthServer(tcpServer, e.healthServer)
+	workload_pb.RegisterSpiffeWorkloadAPIServer(tcpServer, e.workloadAPIServer)
+	discovery_v2.RegisterSecretDiscoveryServiceServer(tcpServer, e.sdsv2Server)
+	secret_v3.RegisterSecretDiscoveryServiceServer(tcpServer, e.sdsv3Server)
+
+	l, err := net.Listen(e.TCPAddr.Network(), e.TCPAddr.String())
+	if err != nil {
+		return err
+	}
+	defer l.Close()
+	e.log.WithFields(logrus.Fields{
+		telemetry.Network: l.Addr().Network(),
+		telemetry.Address: l.Addr().String()})
+
+	// Skip use of tomb here so we don't pollute a clean shutdown with errors
+	e.log.Info("Starting Server APIs")
+	errChan := make(chan error)
+	go func() { errChan <- server.Serve(l) }()
+
+	select {
+	case err = <-errChan:
+		e.log.WithError(err).Error("Server APIs stopped prematurely")
+		return err
+	case <-ctx.Done():
+		e.log.Info("Stopping Server APIs")
+		server.Stop()
+		<-errChan
+		e.log.Info("Server APIs have stopped")
+		return nil
 	}
 }
