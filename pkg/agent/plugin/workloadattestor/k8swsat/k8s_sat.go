@@ -3,6 +3,7 @@ package k8swsat
 import (
 	"context"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/andres-erbsen/clock"
@@ -39,6 +40,7 @@ type Plugin struct {
 
 	log   hclog.Logger
 	clock clock.Clock
+	mtx   sync.RWMutex
 }
 
 func New() *Plugin {
@@ -54,28 +56,25 @@ func (p *Plugin) SetLogger(log hclog.Logger) {
 func (p *Plugin) Attest(ctx context.Context, req *workloadattestorv1.AttestRequest) (*workloadattestorv1.AttestResponse, error) {
 
 	var log hclog.Logger
-
-	if req.Meta == nil {
-		fmt.Println("using default SA Token")
-		req.Meta = map[string]string{
-			"sa_token": defaultSAToken,
-		}
-		return &workloadattestorv1.AttestResponse{}, nil
-	}
+	p.mtx.RLock()
+	defer p.mtx.RUnlock()
 
 	for attempt := 1; ; attempt++ {
+
+		fmt.Printf("attempt: %v\n", attempt)
 
 		log = log.With(telemetry.Attempt, attempt)
 
 		var selectorValues []string
 
 		var attestResponse *workloadattestorv1.AttestResponse
-		token := req.Meta["sa_token"]
+		token := defaultSAToken
 		selectorValues = append(selectorValues, getSelectorValuesFromToken(token)...)
 
 		if len(selectorValues) > 0 {
 			attestResponse = &workloadattestorv1.AttestResponse{SelectorValues: selectorValues}
 		}
+		fmt.Printf("attestResponse: %v\n", attestResponse)
 
 		if attestResponse != nil {
 			return attestResponse, nil
@@ -101,6 +100,8 @@ func (p *Plugin) Configure(ctx context.Context, req *configv1.ConfigureRequest) 
 }
 
 func getSelectorValuesFromToken(token string) []string {
+
+	fmt.Printf("token getSelectorValuesFromToken: %v\n", token)
 
 	tokenMap, _, err := new(jwt.Parser).ParseUnverified(token, jwt.MapClaims{})
 	if err != nil {
