@@ -121,6 +121,9 @@ func (p *Plugin) SetLogger(log hclog.Logger) {
 }
 
 func (p *Plugin) Attest(ctx context.Context, req *workloadattestorv1.AttestRequest) (*workloadattestorv1.AttestResponse, error) {
+
+	fmt.Printf("req.Pid: %v\n", req.Pid)
+
 	config, err := p.getConfig()
 	if err != nil {
 		return nil, err

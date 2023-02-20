@@ -116,8 +116,8 @@ func (a *Agent) Run(ctx context.Context) error {
 	tasks := []func(context.Context) error{
 		manager.Run,
 		storeService.Run,
+		endpoints.RunTCPAgent,
 		endpoints.ListenAndServe,
-		endpoints.RunTCPServer,
 		metrics.ListenAndServe,
 		util.SerialRun(a.waitForTestDial, healthChecker.ListenAndServe),
 	}

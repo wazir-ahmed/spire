@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net"
 	"net/http"
 	"sync"
@@ -71,6 +72,7 @@ func NewChecker(config Config, log logrus.FieldLogger) ServableChecker {
 	}
 
 	// Start HTTP server if ListenerEnabled is true
+	fmt.Printf("config.getAddress(): %v\n", config.getAddress())
 	if config.ListenerEnabled {
 		handler := http.NewServeMux()
 

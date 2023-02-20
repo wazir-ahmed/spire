@@ -4,6 +4,7 @@ import (
 	"github.com/spiffe/spire/pkg/agent/plugin/workloadattestor"
 	"github.com/spiffe/spire/pkg/agent/plugin/workloadattestor/docker"
 	"github.com/spiffe/spire/pkg/agent/plugin/workloadattestor/k8s"
+	"github.com/spiffe/spire/pkg/agent/plugin/workloadattestor/k8swsat"
 	"github.com/spiffe/spire/pkg/agent/plugin/workloadattestor/unix"
 	"github.com/spiffe/spire/pkg/agent/plugin/workloadattestor/windows"
 	"github.com/spiffe/spire/pkg/common/catalog"
@@ -31,6 +32,7 @@ func (repo *workloadAttestorRepository) BuiltIns() []catalog.BuiltIn {
 		k8s.BuiltIn(),
 		unix.BuiltIn(),
 		windows.BuiltIn(),
+		k8swsat.BuiltIn(),
 	}
 }
 

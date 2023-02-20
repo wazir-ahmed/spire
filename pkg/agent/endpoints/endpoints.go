@@ -22,6 +22,7 @@ import (
 
 type Server interface {
 	ListenAndServe(ctx context.Context) error
+	RunTCPAgent(ctx context.Context) error
 }
 
 type Endpoints struct {
@@ -164,48 +165,52 @@ func (e *Endpoints) triggerListeningHook() {
 	}
 }
 
-func (e *Endpoints) createTCPServer(ctx context.Context) *grpc.Server {
+func (e *Endpoints) createTCPAgent(ctx context.Context) *grpc.Server {
 
 	unaryInterceptor, streamInterceptor := middleware.Interceptors(
 		Middleware(e.log, e.metrics),
 	)
 	return grpc.NewServer(
+		grpc.Creds(peertracker.NewCredentials()),
 		grpc.UnaryInterceptor(unaryInterceptor),
 		grpc.StreamInterceptor(streamInterceptor),
 	)
 }
 
-// runTCPServer will start the server and block until it exits or we are dying.
-func (e *Endpoints) RunTCPServer(ctx context.Context, server *grpc.Server) error {
-	tcpServer := e.createTCPServer(ctx)
+// runTCPServer will start the agent and block until it exits or we are dying.
+func (e *Endpoints) RunTCPAgent(ctx context.Context) error {
+	tcpServer := e.createTCPAgent(ctx)
 	grpc_health_v1.RegisterHealthServer(tcpServer, e.healthServer)
 	workload_pb.RegisterSpiffeWorkloadAPIServer(tcpServer, e.workloadAPIServer)
 	discovery_v2.RegisterSecretDiscoveryServiceServer(tcpServer, e.sdsv2Server)
 	secret_v3.RegisterSecretDiscoveryServiceServer(tcpServer, e.sdsv3Server)
 
-	l, err := net.Listen(e.TCPAddr.Network(), e.TCPAddr.String())
+	l, err := e.createTCPListener()
 	if err != nil {
 		return err
 	}
+	e.triggerListeningHook()
 	defer l.Close()
+
 	e.log.WithFields(logrus.Fields{
-		telemetry.Network: l.Addr().Network(),
-		telemetry.Address: l.Addr().String()})
-
-	// Skip use of tomb here so we don't pollute a clean shutdown with errors
-	e.log.Info("Starting Server APIs")
+		telemetry.Network: e.TCPAddr.Network(),
+		telemetry.Address: e.TCPAddr,
+	}).Info("Starting Workload and SDS APIs")
+	e.triggerListeningHook()
 	errChan := make(chan error)
-	go func() { errChan <- server.Serve(l) }()
-
+	go func() {
+		errChan <- tcpServer.Serve(l)
+	}()
 	select {
 	case err = <-errChan:
-		e.log.WithError(err).Error("Server APIs stopped prematurely")
-		return err
 	case <-ctx.Done():
-		e.log.Info("Stopping Server APIs")
-		server.Stop()
-		<-errChan
-		e.log.Info("Server APIs have stopped")
-		return nil
+		e.log.Info("Stopping Workload and SDS APIs")
+		tcpServer.Stop()
+		err = <-errChan
+		if errors.Is(err, grpc.ErrServerStopped) {
+			err = nil
+		}
 	}
+	return err
+
 }
