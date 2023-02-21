@@ -64,5 +64,3 @@ func (w FakeWatcher) IsAlive() error {
 }
 
 func (w FakeWatcher) PID() int32 { return int32(os.Getpid()) }
-
-func (w FakeWatcher) Meta() map[string]string { return map[string]string{} }

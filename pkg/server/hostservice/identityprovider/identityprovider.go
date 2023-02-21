@@ -7,10 +7,10 @@ import (
 	"errors"
 	"sync"
 
-	"github.com/spiffe/go-spiffe/v2/spiffeid"
 	"github.com/spiffe/spire/pkg/common/coretypes/jwtkey"
 	"github.com/spiffe/spire/pkg/common/coretypes/x509certificate"
 	"github.com/spiffe/spire/pkg/server/datastore"
+	"github.com/vishnusomank/go-spiffe/v2/spiffeid"
 	identityproviderv1 "github.com/vishnusomank/spire-plugin-sdk/proto/spire/hostservice/server/identityprovider/v1"
 	plugintypes "github.com/vishnusomank/spire-plugin-sdk/proto/spire/plugin/types"
 	"github.com/zeebo/errs"

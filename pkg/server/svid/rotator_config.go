@@ -6,10 +6,10 @@ import (
 	"github.com/andres-erbsen/clock"
 	"github.com/imkira/go-observer"
 	"github.com/sirupsen/logrus"
-	"github.com/spiffe/go-spiffe/v2/spiffeid"
 	"github.com/spiffe/spire/pkg/common/telemetry"
 	"github.com/spiffe/spire/pkg/server/ca"
 	"github.com/spiffe/spire/pkg/server/plugin/keymanager"
+	"github.com/vishnusomank/go-spiffe/v2/spiffeid"
 )
 
 const (

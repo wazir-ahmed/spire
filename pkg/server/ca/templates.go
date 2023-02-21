@@ -9,9 +9,9 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/spiffe/go-spiffe/v2/spiffeid"
 	"github.com/spiffe/spire/pkg/common/x509util"
 	"github.com/spiffe/spire/pkg/server/api"
+	"github.com/vishnusomank/go-spiffe/v2/spiffeid"
 )
 
 func CreateServerCATemplate(spiffeID spiffeid.ID, publicKey crypto.PublicKey, trustDomain spiffeid.TrustDomain, notBefore, notAfter time.Time, serialNumber *big.Int, subject pkix.Name) (*x509.Certificate, error) {

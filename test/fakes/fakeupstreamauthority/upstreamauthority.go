@@ -11,7 +11,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/spiffe/go-spiffe/v2/spiffeid"
 	"github.com/spiffe/spire/pkg/common/coretypes/jwtkey"
 	"github.com/spiffe/spire/pkg/common/coretypes/x509certificate"
 	"github.com/spiffe/spire/pkg/common/x509svid"
@@ -19,6 +18,7 @@ import (
 	"github.com/spiffe/spire/proto/spire/common"
 	"github.com/spiffe/spire/test/testkey"
 	"github.com/stretchr/testify/require"
+	"github.com/vishnusomank/go-spiffe/v2/spiffeid"
 	upstreamauthorityv1 "github.com/vishnusomank/spire-plugin-sdk/proto/spire/plugin/server/upstreamauthority/v1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

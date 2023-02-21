@@ -174,10 +174,6 @@ func (l *linuxWatcher) PID() int32 {
 	return l.pid
 }
 
-func (l *linuxWatcher) Meta() map[string]string {
-	return l.meta
-}
-
 func parseTaskStat(stat string) ([]string, error) {
 	b := strings.IndexByte(stat, '(')
 	e := strings.LastIndexByte(stat, ')')

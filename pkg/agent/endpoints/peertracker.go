@@ -2,6 +2,7 @@ package endpoints
 
 import (
 	"context"
+	"fmt"
 
 	attestor "github.com/spiffe/spire/pkg/agent/attestor/workload"
 	"github.com/spiffe/spire/pkg/common/peertracker"
@@ -20,7 +21,16 @@ func (a PeerTrackerAttestor) Attest(ctx context.Context) ([]*common.Selector, er
 		return nil, status.Error(codes.Internal, "peer tracker watcher missing from context")
 	}
 
-	selectors := a.Attestor.Attest(ctx, int(watcher.PID()), watcher.Meta())
+	var meta map[string]string
+
+	v := ctx.Value("meta")
+	if v != nil {
+		meta = v.(map[string]string)
+	}
+
+	fmt.Println("Attest Req Meta =>", meta)
+
+	selectors := a.Attestor.Attest(ctx, int(watcher.PID()), meta)
 
 	// Ensure that the original caller is still alive so that we know we didn't
 	// attest some other process that happened to be assigned the original PID

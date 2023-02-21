@@ -12,9 +12,9 @@ import (
 	"time"
 
 	"github.com/Microsoft/go-winio"
-	"github.com/spiffe/go-spiffe/v2/proto/spiffe/workload"
 	"github.com/spiffe/spire/pkg/common/namedpipe"
 	"github.com/stretchr/testify/require"
+	"github.com/vishnusomank/go-spiffe/v2/proto/spiffe/workload"
 	"google.golang.org/grpc"
 )
 

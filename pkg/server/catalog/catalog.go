@@ -8,7 +8,6 @@ import (
 
 	"github.com/andres-erbsen/clock"
 	"github.com/sirupsen/logrus"
-	"github.com/spiffe/go-spiffe/v2/spiffeid"
 	"github.com/spiffe/spire/pkg/common/catalog"
 	"github.com/spiffe/spire/pkg/common/health"
 	"github.com/spiffe/spire/pkg/common/hostservice/metricsservice"
@@ -26,6 +25,7 @@ import (
 	"github.com/spiffe/spire/pkg/server/plugin/nodeattestor/jointoken"
 	"github.com/spiffe/spire/pkg/server/plugin/notifier"
 	"github.com/spiffe/spire/pkg/server/plugin/upstreamauthority"
+	"github.com/vishnusomank/go-spiffe/v2/spiffeid"
 	"github.com/vishnusomank/spire-plugin-sdk/pluginsdk"
 	metricsv1 "github.com/vishnusomank/spire-plugin-sdk/proto/spire/hostservice/common/metrics/v1"
 	agentstorev1 "github.com/vishnusomank/spire-plugin-sdk/proto/spire/hostservice/server/agentstore/v1"

@@ -10,7 +10,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/spiffe/go-spiffe/v2/workloadapi"
 	admin_api "github.com/spiffe/spire/pkg/agent/api"
 	node_attestor "github.com/spiffe/spire/pkg/agent/attestor/node"
 	workload_attestor "github.com/spiffe/spire/pkg/agent/attestor/workload"
@@ -27,6 +26,7 @@ import (
 	"github.com/spiffe/spire/pkg/common/telemetry"
 	"github.com/spiffe/spire/pkg/common/uptime"
 	"github.com/spiffe/spire/pkg/common/util"
+	"github.com/vishnusomank/go-spiffe/v2/workloadapi"
 	_ "golang.org/x/net/trace" // registers handlers on the DefaultServeMux
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -87,7 +87,6 @@ func (a *Agent) Run(ctx context.Context) error {
 	if a.c.JoinToken == "" {
 		nodeAttestor = cat.GetNodeAttestor()
 	}
-
 	as, err := a.attest(ctx, sto, cat, metrics, nodeAttestor)
 	if err != nil {
 		return err
@@ -325,7 +324,7 @@ func (a *Agent) checkWorkloadAPI() error {
 		return err
 	}
 
-	_, err = workloadapi.FetchX509Bundles(context.TODO(), clientOption)
+	_, err = workloadapi.FetchX509Bundles(context.TODO(), nil, clientOption)
 	if status.Code(err) == codes.Unavailable {
 		// Only an unavailable status fails the health check.
 		return errors.New("workload api is unavailable")
