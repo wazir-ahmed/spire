@@ -1,6 +1,7 @@
 package peertracker
 
 import (
+	"fmt"
 	"io"
 	"net"
 
@@ -44,10 +45,13 @@ func (l *Listener) Accept() (net.Conn, error) {
 		case "pipe":
 			caller, err = CallerFromNamedPipeConn(conn)
 		case "tcp":
+			caller, err = receiveTCPConn(conn)
+			fmt.Println("tcp call")
 			caller = CallerInfo{
 				Addr: conn.RemoteAddr(),
 				PID:  1,
 			}
+
 		default:
 			err = ErrUnsupportedTransport
 		}

@@ -9,10 +9,9 @@ import (
 	"github.com/andres-erbsen/clock"
 	"github.com/golang-jwt/jwt"
 	"github.com/hashicorp/go-hclog"
-	workloadattestorv1 "github.com/spiffe/spire-plugin-sdk/proto/spire/plugin/agent/workloadattestor/v1"
-	configv1 "github.com/spiffe/spire-plugin-sdk/proto/spire/service/common/config/v1"
 	"github.com/spiffe/spire/pkg/common/catalog"
-	"github.com/spiffe/spire/pkg/common/telemetry"
+	workloadattestorv1 "github.com/vishnusomank/spire-plugin-sdk/proto/spire/plugin/agent/workloadattestor/v1"
+	configv1 "github.com/vishnusomank/spire-plugin-sdk/proto/spire/service/common/config/v1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -61,10 +60,6 @@ func (p *Plugin) Attest(ctx context.Context, req *workloadattestorv1.AttestReque
 
 	for attempt := 1; ; attempt++ {
 
-		fmt.Printf("attempt: %v\n", attempt)
-
-		log = log.With(telemetry.Attempt, attempt)
-
 		var selectorValues []string
 
 		var attestResponse *workloadattestorv1.AttestResponse
@@ -74,7 +69,6 @@ func (p *Plugin) Attest(ctx context.Context, req *workloadattestorv1.AttestReque
 		if len(selectorValues) > 0 {
 			attestResponse = &workloadattestorv1.AttestResponse{SelectorValues: selectorValues}
 		}
-		fmt.Printf("attestResponse: %v\n", attestResponse)
 
 		if attestResponse != nil {
 			return attestResponse, nil
@@ -100,8 +94,6 @@ func (p *Plugin) Configure(ctx context.Context, req *configv1.ConfigureRequest) 
 }
 
 func getSelectorValuesFromToken(token string) []string {
-
-	fmt.Printf("token getSelectorValuesFromToken: %v\n", token)
 
 	tokenMap, _, err := new(jwt.Parser).ParseUnverified(token, jwt.MapClaims{})
 	if err != nil {

@@ -30,6 +30,7 @@ type Watcher interface {
 	Close()
 	IsAlive() error
 	PID() int32
+	Meta() map[string]string
 }
 
 // NewTracker creates a new platform-specific peer tracker. Close() must

@@ -1409,7 +1409,8 @@ func (w FakeWatcher) Close() {}
 
 func (w FakeWatcher) IsAlive() error { return nil }
 
-func (w FakeWatcher) PID() int32 { return 123 }
+func (w FakeWatcher) PID() int32              { return 123 }
+func (w FakeWatcher) Meta() map[string]string { return map[string]string{} }
 
 func requireSecrets(t *testing.T, resp *discovery_v3.DiscoveryResponse, expectedSecrets ...*tls_v3.Secret) {
 	var actualSecrets []*tls_v3.Secret

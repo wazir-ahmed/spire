@@ -4,10 +4,10 @@ import (
 	"context"
 
 	"github.com/spiffe/go-spiffe/v2/spiffeid"
-	notifierv1 "github.com/spiffe/spire-plugin-sdk/proto/spire/plugin/server/notifier/v1"
-	"github.com/spiffe/spire-plugin-sdk/proto/spire/plugin/types"
 	"github.com/spiffe/spire/pkg/common/plugin"
 	"github.com/spiffe/spire/proto/spire/common"
+	notifierv1 "github.com/vishnusomank/spire-plugin-sdk/proto/spire/plugin/server/notifier/v1"
+	"github.com/vishnusomank/spire-plugin-sdk/proto/spire/plugin/types"
 	"google.golang.org/grpc/codes"
 )
 

@@ -330,6 +330,7 @@ func (a *Agent) checkWorkloadAPI() error {
 		// Only an unavailable status fails the health check.
 		return errors.New("workload api is unavailable")
 	}
+
 	return nil
 }
 

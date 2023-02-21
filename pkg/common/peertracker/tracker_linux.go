@@ -44,6 +44,7 @@ type linuxWatcher struct {
 	starttime string
 	uid       uint32
 	log       logrus.FieldLogger
+	meta      map[string]string
 }
 
 func newLinuxWatcher(info CallerInfo, log logrus.FieldLogger) (*linuxWatcher, error) {
@@ -82,6 +83,7 @@ func newLinuxWatcher(info CallerInfo, log logrus.FieldLogger) (*linuxWatcher, er
 		starttime: starttime,
 		uid:       info.UID,
 		log:       log,
+		meta:      info.Meta,
 	}, nil
 }
 
@@ -170,6 +172,10 @@ func (l *linuxWatcher) IsAlive() error {
 
 func (l *linuxWatcher) PID() int32 {
 	return l.pid
+}
+
+func (l *linuxWatcher) Meta() map[string]string {
+	return l.meta
 }
 
 func parseTaskStat(stat string) ([]string, error) {
